@@ -86,11 +86,3 @@ class LDRConfiguration(object):
         setattr(self, section_name, {})
         for key,value in section.items():
             getattr(self, section_name)[key] = value
-
-    def set_db_info(self):
-        self.db_info = {}
-        self.retrieve_data_from_a_section(self.data['Database'])
-
-    def set_log_info(self):
-        self.log_info = {}
-        self.retrieve_data_from_a_section(self.data['Logging'])

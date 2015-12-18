@@ -28,8 +28,8 @@ class LDRConfiguration(object):
 
     def get_config(self):
         out = dict()
-        attributes = [x for x in dir(self) if not callable(getattr(self,x)) \
-                      and not x.startswith('__') and not x.startswith('_') and isinstance(getattr(self,x), dict)]
+        attributes = [x for x in dir(self) if not callable(getattr(self, x)) \
+                      and not x.startswith('__') and not x.startswith('_') and isinstance(getattr(self, x), dict)]
         for n in attributes:
             out[n] = getattr(self,n)
         return out
@@ -49,7 +49,6 @@ class LDRConfiguration(object):
         return False
 
     def check_for_config_file(self):
-
         return exists(join(self._config_directory,'ldr.ini'))
 
     def write_config_data(self, p):

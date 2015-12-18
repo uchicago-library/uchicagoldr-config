@@ -40,10 +40,13 @@ class LDRConfiguration(object):
         assert isinstance(p, ConfigParser)
         p.add_section('Database')
         p.add_section('Logging')
-        p.set('Database','db_pass','replace_me')
-        p.set('Database','db_user','fill_me_in_with_something_real')
         p.set('Database','db_host','example.com')
         p.set('Database','db_name','fill_me_in')
+        p.set('Database','db_user','fill_me_in_with_something_real')
+        p.set('Database','db_pass','replace_me')
+
+
+
         p.set('Logging','server','example.com')
         p.set('Logging','port','1')        
         return p
@@ -54,6 +57,9 @@ class LDRConfiguration(object):
             parser.read(join(self._config_directory,'ldr.ini'))
         else:
             parser = self.write_config_data(parser)
+            cfgfile = open(join(self._config_directory,'ldr.ini'),'w')
+            parser.write(cfgfile)
+            cfgfile.close()
         return parser
 
     def set_config_data(self, data_object):

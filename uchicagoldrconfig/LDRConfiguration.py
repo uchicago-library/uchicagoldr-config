@@ -1,15 +1,30 @@
 
-from os import access, mkdir, R_OK, W_OK
-from os.path import dirname, exists, isdir, join, realpath
+
 from configparser import ConfigParser, SectionProxy
+from inspect import getfile, getmodulename, getsourcefile
+from os import access, mkdir, R_OK, W_OK
+from os.path import abspath, dirname, exists, isdir, join, realpath
+import sys
 
 class LDRConfiguration(object):
     _base_directory = dirname(realpath(__file__))
     _config_directory = join(_base_directory, 'config')
 
-    def __init__(self):
+    def __init__(self, config_directory):
+        self.set_base_directory(config_directory)
+        print(self._base_directory)
+        self.set_config_directory()
         self.evaluate_for_configdata()
 
+    def set_config_directory(self):
+        self._config_directory = join(self._base_directory, 'config')
+
+    def set_base_directory(self, directory_path):
+        assert isinstance(directory_path, str)
+        assert exists(directory_path)
+        self._base_directory = abspath(directory_path)
+        self.evaluate_for_configdata()
+        return True
 
     def get_config(self):
         out = dict()
@@ -34,6 +49,7 @@ class LDRConfiguration(object):
         return False
 
     def check_for_config_file(self):
+
         return exists(join(self._config_directory,'ldr.ini'))
 
     def write_config_data(self, p):
@@ -44,9 +60,6 @@ class LDRConfiguration(object):
         p.set('Database','db_name','fill_me_in')
         p.set('Database','db_user','fill_me_in_with_something_real')
         p.set('Database','db_pass','replace_me')
-
-
-
         p.set('Logging','server','example.com')
         p.set('Logging','port','1')        
         return p
@@ -54,8 +67,10 @@ class LDRConfiguration(object):
     def retrieve_config_data(self):
         parser = ConfigParser()
         if self.check_for_config_file():
+            print("hi")
             parser.read(join(self._config_directory,'ldr.ini'))
         else:
+            print("nope")
             parser = self.write_config_data(parser)
             cfgfile = open(join(self._config_directory,'ldr.ini'),'w')
             parser.write(cfgfile)

@@ -5,21 +5,39 @@ from inspect import getfile, getmodulename, getsourcefile
 from os import access, mkdir, R_OK, W_OK
 from os.path import abspath, dirname, expanduser, exists, isdir, join, realpath
 import sys
+from xdg import BaseDirectory
 
 class LDRConfiguration(object):
     config_file = None
     data_file = None
     data = {}
-    
+
     def __init__(self, config_directory=None):
         if config_directory and exists(abspath(config_directory)):
-            cfg_file = abspath(join(config_directory, 'ldr.ini'))
+            if exists(join(config_directory, 'ldr.ini')):
+                cfg_file = abspath(join(config_directory, 'ldr.ini'))
+            else:
+                raise ValueError('No config file exists in the ' +
+                                 'specified directory')
         else:
-            cfg_file = expanduser(join("~/.config/ldr/ldr.ini"))
+#            cfg_file = expanduser(join("~/.config/ldr/ldr.ini"))
+            foundOne = False
+            checkedDirs = []
+            for directory in BaseDirectory.load_config_paths('ldr'):
+                checkedDirs.append(directory)
+                if exists(join(directory,'ldr.ini')):
+                    foundOne = True
+                    cfg_file = join(directory,'ldr.ini')
+                    break
+            if foundOne is False:
+                raise ValueErorr('No config file was found in XDG config ' +
+                                 'directories. The following directories ' +
+                                 'were checked:\n{}'.format(
+                                     '\n'.join(checkedDirs))
+                                 )
         self.config_file = cfg_file
         self.data_file = self.retrieve_config_data()
         self.data = self.read_config_data()
-        print(self.data)
 
     def find_config_sections(self):
         output = []
@@ -40,7 +58,7 @@ class LDRConfiguration(object):
         if not self.data.get(sname):
             return ValueError("there is no {} section".format(sname))
         elif not self.data.get(sname).get(data_element):
-            return ValueError("there is no {} data element".format(data_element))        
+            return ValueError("there is no {} data element".format(data_element))
         else:
             return self.data.get(sname).get(data_element)
 

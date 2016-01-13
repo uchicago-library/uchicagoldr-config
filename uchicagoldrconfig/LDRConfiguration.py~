@@ -8,21 +8,21 @@ import sys
 
 class LDRConfiguration(object):
     _base_directory = dirname(realpath(__file__))
-    _config_directory = join(_base_directory, 'config')
+    _config_directory = _base_directory
 
     def __init__(self, config_directory):
         self.set_base_directory(config_directory)
-        print(self._base_directory)
         self.set_config_directory()
         self.evaluate_for_configdata()
 
     def set_config_directory(self):
-        self._config_directory = join(self._base_directory, 'config')
+        self._config_directory = join(self._base_directory)
 
     def set_base_directory(self, directory_path):
         assert isinstance(directory_path, str)
         assert exists(directory_path)
         self._base_directory = abspath(directory_path)
+
         self.evaluate_for_configdata()
         return True
 
@@ -66,10 +66,8 @@ class LDRConfiguration(object):
     def retrieve_config_data(self):
         parser = ConfigParser()
         if self.check_for_config_file():
-            print("hi")
             parser.read(join(self._config_directory,'ldr.ini'))
         else:
-            print("nope")
             parser = self.write_config_data(parser)
             cfgfile = open(join(self._config_directory,'ldr.ini'),'w')
             parser.write(cfgfile)
@@ -82,7 +80,7 @@ class LDRConfiguration(object):
         self.data = data_object
 
     def evaluate_for_configdata(self):
-        config_file = join(self._base_directory,'config','ldr.ini')
+        config_file = join(self._base_directory,'ldr.ini')
         if not self.check_config_directory():
             self.make_config_directory()
         data = self.retrieve_config_data()
